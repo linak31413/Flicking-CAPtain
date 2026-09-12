@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#10222b">
+  <title>Flicking CAPtain</title>
+  <link rel="icon" href="assets/images/ui/coin.png">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div id="app" class="app">
+    <div id="loadingScreen" class="loading-screen" aria-live="polite">
+      <img class="loading-logo" src="assets/images/logo.png" alt="Flicking CAPtain">
+      <div class="loading-bar"><span id="loadingProgress"></span></div>
+      <p id="loadingText">Loading assets</p>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <section id="screen-main" class="screen screen-main is-active" data-screen="MAIN">
+      <div class="main-shell">
+        <img class="game-logo" src="assets/images/logo.png" alt="Flicking CAPtain">
+        <div class="main-actions">
+          <button id="btnStart" class="button button-primary" type="button">스테이지 선택</button>
+          <button id="btnShop" class="button" type="button">코인 상점</button>
+          <button id="btnSettings" class="button button-ghost" type="button">설정</button>
+        </div>
+        <div class="coin-pill">
+          <img src="assets/images/ui/coin.png" alt="">
+          <span id="mainCoins">0</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-stage" class="screen" data-screen="STAGE_SELECT">
+      <div class="topbar">
+        <button id="btnStageBack" class="button button-ghost" type="button">메인</button>
+        <h1>스테이지</h1>
+        <div class="coin-pill small">
+          <img src="assets/images/ui/coin.png" alt="">
+          <span id="stageCoins">0</span>
+        </div>
+      </div>
+      <div class="stage-layout">
+        <button id="btnStagePrev" class="nav-button" type="button" aria-label="이전 스테이지">&lt;</button>
+        <article class="stage-panel">
+          <div class="stage-art-wrap">
+            <img id="stageTableImage" class="stage-art" src="assets/images/tables/table-01.png" alt="">
+            <span id="stageLockBadge" class="stage-badge">해금</span>
+          </div>
+          <div class="stage-copy">
+            <p id="stageStatus" class="eyebrow">Stage 1</p>
+            <h2 id="stageName">표준 테이블</h2>
+            <p id="stageDescription"></p>
+            <dl class="stage-stats">
+              <div><dt>환경</dt><dd id="stageEnvironment"></dd></div>
+              <div><dt>CPU</dt><dd id="stageCpu"></dd></div>
+              <div><dt>전적</dt><dd id="stageRecord"></dd></div>
+            </dl>
+            <button id="btnPlayStage" class="button button-primary" type="button">플레이</button>
+          </div>
+        </article>
+        <button id="btnStageNext" class="nav-button" type="button" aria-label="다음 스테이지">&gt;</button>
+      </div>
+    </section>
+
+    <section id="screen-game" class="screen screen-game" data-screen="GAME">
+      <header class="game-hud">
+        <div>
+          <span class="hud-label">STAGE</span>
+          <strong id="hudStage">1</strong>
+        </div>
+        <div>
+          <span class="hud-label">TURN</span>
+          <strong id="hudTurn">PLAYER</strong>
+        </div>
+        <div>
+          <span class="hud-label">CAPS</span>
+          <strong><span id="hudPlayerCaps">3</span> / <span id="hudCpuCaps">3</span></strong>
+        </div>
+        <div>
+          <span class="hud-label">WIND</span>
+          <strong id="hudWind">NONE</strong>
+        </div>
+        <button id="btnPause" class="icon-button" type="button" aria-label="일시정지">II</button>
+      </header>
+      <div id="canvasWrap" class="canvas-wrap">
+        <canvas id="gameCanvas" width="420" height="720"></canvas>
+      </div>
+      <div id="tutorialPrompt" class="tutorial-prompt" aria-live="polite" hidden>
+        <img id="tutorialHandImage" class="tutorial-hand-image" src="assets/images/ui/tutorial-hand-drag.png" alt="" hidden>
+        <div id="tutorialGestureFallback" class="tutorial-gesture" aria-hidden="true">
+          <span class="tutorial-cap"></span>
+          <span class="tutorial-pull-line"></span>
+          <span class="tutorial-hand"></span>
+        </div>
+        <strong>병뚜껑을 아래로 당겼다가 놓으세요</strong>
+        <span>당긴 반대 방향으로 병뚜껑이 발사됩니다.</span>
+      </div>
+      <div class="game-message">
+        <strong id="turnBanner">PLAYER TURN</strong>
+        <span id="gameHint"></span>
+      </div>
+    </section>
+
+    <section id="screen-result" class="screen" data-screen="RESULT">
+      <div class="result-shell">
+        <img id="resultImage" class="result-art" src="assets/images/ui/result-win.png" alt="">
+        <p id="resultStage" class="eyebrow">Stage 1</p>
+        <h1 id="resultTitle">승리</h1>
+        <p id="resultSummary"></p>
+        <div id="resultRanks" class="rank-list"></div>
+        <div class="result-actions">
+          <button id="btnNextStage" class="button button-primary" type="button">다음 스테이지</button>
+          <button id="btnRetry" class="button" type="button">다시 하기</button>
+          <button id="btnResultMain" class="button button-ghost" type="button">메인 화면</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-shop" class="screen" data-screen="SHOP">
+      <div class="topbar">
+        <button id="btnShopBack" class="button button-ghost" type="button">메인</button>
+        <h1>코인 상점</h1>
+        <div class="coin-pill small">
+          <img src="assets/images/ui/coin.png" alt="">
+          <span id="shopCoins">0</span>
+        </div>
+      </div>
+      <p id="shopBuyHint" class="shop-hint" hidden>병뚜껑을 구매하세요!</p>
+      <div class="shop-layout">
+        <section class="slot-panel" aria-label="장착 슬롯">
+          <h2>장착 슬롯</h2>
+          <div id="slotList" class="slot-list"></div>
+        </section>
+        <section id="shopList" class="shop-list" aria-label="병뚜껑 구매"></section>
+      </div>
+      <p class="slot-help">병뚜껑을 장착 슬롯에 끌어와 장착하세요!</p>
+    </section>
+
+    <div id="settingsPanel" class="modal" aria-hidden="true">
+      <div class="modal-box">
+        <h2>설정</h2>
+        <label class="control-row">
+          <span>BGM</span>
+          <input id="settingBgm" type="range" min="0" max="1" step="0.05">
+        </label>
+        <label class="control-row">
+          <span>효과음</span>
+          <input id="settingSfx" type="range" min="0" max="1" step="0.05">
+        </label>
+        <label class="check-row"><input id="settingMuted" type="checkbox"> 음소거</label>
+        <label class="check-row"><input id="settingVibrate" type="checkbox"> 진동</label>
+        <label class="check-row"><input id="settingAim" type="checkbox"> 조준 보조</label>
+        <label class="check-row"><input id="settingMotion" type="checkbox"> 동작 감소</label>
+        <div class="modal-actions">
+          <button id="btnResetSave" class="button button-danger" type="button">저장 초기화</button>
+          <button id="btnCloseSettings" class="button button-primary" type="button">닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="pausePanel" class="modal" aria-hidden="true">
+      <div class="modal-box">
+        <h2>일시정지</h2>
+        <div class="modal-actions vertical">
+          <button id="btnResume" class="button button-primary" type="button">계속하기</button>
+          <button id="btnRestart" class="button" type="button">재시작</button>
+          <button id="btnPauseMain" class="button button-ghost" type="button">메인 화면</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/stages.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/camera.js"></script>
+  <script src="js/physics.js"></script>
+  <script src="js/cpu.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/shop.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+@media (max-width: 860px) {
+  .screen {
+    padding: calc(14px + var(--safe-top)) 12px calc(14px + var(--safe-bottom));
+  }
+
+  .topbar {
+    grid-template-columns: auto 1fr;
+  }
+
+  .topbar .coin-pill {
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
+
+  .stage-layout {
+    grid-template-columns: 48px minmax(0, 1fr) 48px;
+    gap: 8px;
+  }
+
+  .nav-button {
+    width: 48px;
+    height: 58px;
+  }
+
+  .stage-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-art-wrap,
+  .stage-art {
+    min-height: 260px;
+  }
+
+  .shop-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .shop-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 599px) {
+  .main-shell,
+  .result-shell {
+    min-height: calc(100svh - 28px - var(--safe-top) - var(--safe-bottom));
+  }
+
+  .main-actions,
+  .result-actions {
+    width: min(360px, 100%);
+    flex-direction: column;
+  }
+
+  .button {
+    width: 100%;
+  }
+
+  .game-hud {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  }
+
+  .game-hud > div {
+    padding: 6px 8px;
+  }
+
+  .game-hud > div:nth-child(3),
+  .game-hud > div:nth-child(4) {
+    grid-row: 2;
+  }
+
+  .game-hud .icon-button {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    height: 100%;
+    min-width: 48px;
+  }
+
+  #gameCanvas {
+    width: 100vw;
+  }
+
+  .game-message {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .game-message span {
+    text-align: left;
+  }
+
+  .tutorial-prompt {
+    width: min(280px, calc(100vw - 28px));
+    padding: 14px;
+  }
+
+  .tutorial-hand-image,
+  .tutorial-gesture {
+    width: 104px;
+    height: 112px;
+  }
+
+  .shop-card {
+    grid-template-columns: 56px 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
