@@ -146,8 +146,9 @@
         var frame = getSheetFrame(effect);
         if (!frame) return;
         var pos = renderer.worldToScreen(effect.x, effect.y);
-        var size = effect.size * renderer.scale;
-        ctx.drawImage(frame.img, frame.sx, frame.sy, frame.sw, frame.sh, pos.x - size / 2, pos.y - size / 2, size, size);
+        var width = effect.size * renderer.scale;
+        var height = width * frame.sh / frame.sw;
+        ctx.drawImage(frame.img, frame.sx, frame.sy, frame.sw, frame.sh, pos.x - width / 2, pos.y - height / 2, width, height);
       });
     }
   };

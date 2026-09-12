@@ -52,7 +52,7 @@
     });
 
     if (event.kind === "hole") {
-      FC.Sprites.addEffect("fall", event.x, event.y, cap.radius * 3.4);
+      FC.Sprites.addEffect("fall", event.x, event.y, Math.max(cap.radius * 3.4, event.r * 2.65));
       members.forEach(function (member) {
         if (member !== cap) FC.Sprites.addFadeCap(member);
       });
@@ -85,7 +85,7 @@
 
   function eliminationEvent(game, cap) {
     var hole = hitHole(game, cap);
-    if (hole) return { kind: "hole", x: hole.x, y: hole.y };
+    if (hole) return { kind: "hole", x: hole.x, y: hole.y, r: hole.r };
     if (isOut(game, cap)) return { kind: "out", x: cap.x, y: cap.y };
     return null;
   }
