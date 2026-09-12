@@ -31,9 +31,11 @@
     FC.Storage.save(FC.state.data);
     FC.Shop.render();
     FC.UI.updateCoins();
+    FC.UI.updateBuyHints();
   }
 
   FC.Shop = {
+    hasPurchasableCap: hasPurchasableCap,
     init: function () {
       this.render();
     },

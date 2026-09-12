@@ -52,8 +52,18 @@
     flex-direction: column;
   }
 
+  .shop-action-anchor,
+  .result-main-anchor {
+    width: 100%;
+  }
+
   .button {
     width: 100%;
+  }
+
+  .main-shop-hint {
+    width: min(260px, calc(100vw - 40px));
+    white-space: normal;
   }
 
   .game-hud {

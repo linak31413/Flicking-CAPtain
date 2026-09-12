@@ -75,9 +75,28 @@
       if (this.effects.length >= CONFIG.physics.maxEffects) this.effects.shift();
       this.effects.push({ kind: kind, x: x, y: y, size: size || 72, frame: 0, time: 0, done: false });
     },
+    addFadeCap: function (cap) {
+      if (this.effects.length >= CONFIG.physics.maxEffects) this.effects.shift();
+      this.effects.push({
+        kind: "fade",
+        x: cap.x,
+        y: cap.y,
+        radius: cap.radius,
+        type: cap.type,
+        owner: cap.owner,
+        time: 0,
+        duration: 0.42,
+        done: false
+      });
+    },
     update: function (dt, paused) {
       if (paused) return;
       this.effects.forEach(function (effect) {
+        if (effect.kind === "fade") {
+          effect.time += dt;
+          effect.done = effect.time >= effect.duration;
+          return;
+        }
         var frame = getSheetFrame(effect);
         if (!frame) {
           effect.done = true;
@@ -99,6 +118,31 @@
     },
     drawEffects: function (ctx, renderer) {
       this.effects.forEach(function (effect) {
+        if (effect.kind === "fade") {
+          var progress = Math.min(1, effect.time / effect.duration);
+          var pos = renderer.worldToScreen(effect.x, effect.y);
+          var r = effect.radius * renderer.scale * (1 + progress * 0.16);
+          var img = FC.Sprites.image("cap:" + effect.type);
+          var type = CONFIG.capTypes[effect.type];
+          ctx.save();
+          ctx.globalAlpha = 1 - progress;
+          ctx.translate(0, -10 * progress);
+          if (img) {
+            ctx.drawImage(img, pos.x - r, pos.y - r, r * 2, r * 2);
+          } else {
+            ctx.fillStyle = type ? type.color : "#0f8f8f";
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.lineWidth = Math.max(3, r * 0.14);
+          ctx.strokeStyle = effect.owner === CONFIG.owners.PLAYER ? "#0f8f8f" : "#e85d4f";
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, r + 2, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+          return;
+        }
         var frame = getSheetFrame(effect);
         if (!frame) return;
         var pos = renderer.worldToScreen(effect.x, effect.y);

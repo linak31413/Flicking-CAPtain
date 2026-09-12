@@ -173,8 +173,14 @@
     },
     updateAll: function () {
       this.updateCoins();
+      this.updateBuyHints();
       this.renderStage();
       FC.Shop.render();
+    },
+    updateBuyHints: function () {
+      var hint = el("mainShopHint");
+      if (!hint || !FC.state.data || !FC.Shop || !FC.Shop.hasPurchasableCap) return;
+      hint.hidden = !FC.Shop.hasPurchasableCap(FC.state.data);
     },
     updateHud: function () {
       var game = FC.state.game;
@@ -226,6 +232,7 @@
         });
       }
       el("btnNextStage").style.display = result.outcome === "win" && result.stageId < 8 ? "" : "none";
+      el("resultShopHint").hidden = !result.firstWinReward;
       this.showScreen(CONFIG.screen.RESULT);
     },
     toast: function (message) {

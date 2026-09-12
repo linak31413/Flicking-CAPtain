@@ -38,21 +38,28 @@
     });
   }
 
-  function eliminateCap(game, cap) {
+  function markEliminated(cap) {
     cap.active = false;
     cap.eliminated = true;
     cap.vx = 0;
     cap.vy = 0;
-    FC.Sprites.addEffect("fall", cap.x, cap.y, cap.radius * 3.4);
   }
 
-  function eliminateGroup(game, cap) {
-    if (cap.groupId) {
-      activeGroup(game.caps, cap.groupId).forEach(function (member) {
-        eliminateCap(game, member);
+  function eliminateGroup(game, cap, event) {
+    var members = cap.groupId ? activeGroup(game.caps, cap.groupId) : [cap];
+    members.forEach(function (member) {
+      markEliminated(member);
+    });
+
+    if (event.kind === "hole") {
+      FC.Sprites.addEffect("fall", event.x, event.y, cap.radius * 3.4);
+      members.forEach(function (member) {
+        if (member !== cap) FC.Sprites.addFadeCap(member);
       });
     } else {
-      eliminateCap(game, cap);
+      members.forEach(function (member) {
+        FC.Sprites.addFadeCap(member);
+      });
     }
     FC.Audio.playSfx("cap-fall");
   }
@@ -66,10 +73,21 @@
     return cap.x < minX || cap.x > maxX || cap.y < minY || cap.y > maxY;
   }
 
-  function isInHole(game, cap) {
-    return game.stage.holes.some(function (hole) {
-      return Math.hypot(cap.x - hole.x, cap.y - hole.y) < hole.r + cap.radius * 0.1;
-    });
+  function hitHole(game, cap) {
+    for (var i = 0; i < game.stage.holes.length; i += 1) {
+      var hole = game.stage.holes[i];
+      if (Math.hypot(cap.x - hole.x, cap.y - hole.y) < hole.r + cap.radius * 0.1) {
+        return hole;
+      }
+    }
+    return null;
+  }
+
+  function eliminationEvent(game, cap) {
+    var hole = hitHole(game, cap);
+    if (hole) return { kind: "hole", x: hole.x, y: hole.y };
+    if (isOut(game, cap)) return { kind: "out", x: cap.x, y: cap.y };
+    return null;
   }
 
   function applyFriction(cap, dt) {
@@ -284,8 +302,10 @@
 
   function checkEliminations(game) {
     game.caps.slice().forEach(function (cap) {
+      var event;
       if (!cap.active || !cap.fired) return;
-      if (isOut(game, cap) || isInHole(game, cap)) eliminateGroup(game, cap);
+      event = eliminationEvent(game, cap);
+      if (event) eliminateGroup(game, cap, event);
     });
   }
 

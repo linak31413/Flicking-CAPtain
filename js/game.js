@@ -87,7 +87,7 @@
 
   function applyReward(game, outcome) {
     var data = FC.state.data;
-    if (outcome !== "win") return { reward: 0, unlocked: false };
+    if (outcome !== "win") return { reward: 0, unlocked: false, firstWin: false };
     var index = game.stage.id - 1;
     var first = data.wins[index] === 0;
     var reward = first ? 3 : 1;
@@ -100,7 +100,7 @@
       unlocked = true;
     }
     FC.Storage.save(data);
-    return { reward: reward, unlocked: unlocked };
+    return { reward: reward, unlocked: unlocked, firstWin: first };
   }
 
   function makeResult(game) {
@@ -125,7 +125,8 @@
       summary: summary,
       ranks: ranks,
       reward: reward.reward,
-      unlocked: reward.unlocked
+      unlocked: reward.unlocked,
+      firstWinReward: reward.firstWin && reward.reward === 3
     };
   }
 

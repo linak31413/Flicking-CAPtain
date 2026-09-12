@@ -25,7 +25,10 @@
         <img class="game-logo" src="assets/images/logo.png" alt="Flicking CAPtain">
         <div class="main-actions">
           <button id="btnStart" class="button button-primary" type="button">스테이지 선택</button>
-          <button id="btnShop" class="button" type="button">코인 상점</button>
+          <div class="shop-action-anchor">
+            <p id="mainShopHint" class="buy-pointer main-shop-hint" hidden>병뚜껑을 구매하세요!</p>
+            <button id="btnShop" class="button" type="button">코인 상점</button>
+          </div>
           <button id="btnSettings" class="button button-ghost" type="button">설정</button>
         </div>
         <div class="coin-pill">
@@ -116,7 +119,10 @@
         <div class="result-actions">
           <button id="btnNextStage" class="button button-primary" type="button">다음 스테이지</button>
           <button id="btnRetry" class="button" type="button">다시 하기</button>
-          <button id="btnResultMain" class="button button-ghost" type="button">메인 화면</button>
+          <div class="result-main-anchor">
+            <button id="btnResultMain" class="button button-ghost" type="button">메인 화면</button>
+            <p id="resultShopHint" class="buy-pointer result-shop-hint" hidden>상점에서 새로운 병뚜껑을 구매하세요!</p>
+          </div>
         </div>
       </div>
     </section>
