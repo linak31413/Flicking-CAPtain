@@ -38,6 +38,14 @@
     }
   }
 
+  function stopAudio(audio) {
+    if (!audio) return;
+    audio.pause();
+    try {
+      audio.currentTime = 0;
+    } catch (error) {}
+  }
+
   FC.Audio = {
     init: function () {
       Object.keys(CONFIG.audio.bgm).forEach(function (key) {
@@ -64,14 +72,21 @@
     playBgm: function (key) {
       refreshVolumes();
       var next = bgm[key];
-      if (!next || currentBgm === next) return;
-      if (currentBgm) currentBgm.pause();
+      if (!next) return;
+      if (currentBgm === next) {
+        if (unlocked && currentBgm.paused) safePlay(currentBgm);
+        return;
+      }
+      stopAudio(currentBgm);
       currentBgm = next;
-      currentBgm.currentTime = currentBgm.currentTime || 0;
+      currentBgm.loop = true;
+      try {
+        currentBgm.currentTime = 0;
+      } catch (error) {}
       if (unlocked) safePlay(currentBgm);
     },
     stopBgm: function () {
-      if (currentBgm) currentBgm.pause();
+      stopAudio(currentBgm);
       currentBgm = null;
     },
     playSfx: function (key) {
@@ -81,6 +96,8 @@
       if (lastPlayed[key] && now - lastPlayed[key] < 80) return;
       lastPlayed[key] = now;
       refreshVolumes();
+      audio.loop = false;
+      audio.pause();
       try {
         audio.currentTime = 0;
       } catch (error) {}

@@ -59,6 +59,7 @@
       groupSeed: 0,
       elapsed: 0,
       settleTimer: 0,
+      slideSfxPlayed: false,
       cpuTimer: null,
       paused: false,
       message: "",
@@ -191,6 +192,7 @@
       game.currentCap = null;
       game.status = CONFIG.gameStatus.PLAYING;
       game.settleTimer = 0;
+      game.slideSfxPlayed = false;
       game.cpuTimer = null;
       game.message = "이동 중";
       FC.Audio.playSfx("cap-flick");
@@ -237,7 +239,10 @@
           FC.Physics.update(game, dt);
           if (FC.Physics.hasMovingCaps(game)) {
             game.settleTimer = 0;
-            if (Math.random() < 0.02) FC.Audio.playSfx("cap-slide");
+            if (!game.slideSfxPlayed) {
+              FC.Audio.playSfx("cap-slide");
+              game.slideSfxPlayed = true;
+            }
           } else {
             game.settleTimer += dt;
             if (game.settleTimer >= CONFIG.physics.settleDelay) this.endShot();
