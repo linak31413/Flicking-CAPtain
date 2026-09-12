@@ -4,6 +4,27 @@
   var FC = window.FC;
   var CONFIG = FC.CONFIG;
 
+  var WIND_MARKS = [
+    { x: 0.16, y: 0.18, phase: 0.05, scale: 0.78, alpha: 0.72, tilt: -0.1 },
+    { x: 0.72, y: 0.16, phase: 0.34, scale: 0.94, alpha: 0.62, tilt: 0.07 },
+    { x: 0.42, y: 0.29, phase: 0.62, scale: 0.72, alpha: 0.7, tilt: -0.04 },
+    { x: 0.22, y: 0.43, phase: 0.48, scale: 1.02, alpha: 0.58, tilt: 0.12 },
+    { x: 0.78, y: 0.48, phase: 0.82, scale: 0.8, alpha: 0.68, tilt: -0.08 },
+    { x: 0.5, y: 0.61, phase: 0.17, scale: 1.12, alpha: 0.55, tilt: 0.05 },
+    { x: 0.13, y: 0.75, phase: 0.74, scale: 0.88, alpha: 0.64, tilt: -0.14 },
+    { x: 0.68, y: 0.82, phase: 0.27, scale: 0.76, alpha: 0.72, tilt: 0.1 }
+  ];
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function wrap(value, min, max) {
+    var range = max - min;
+    if (range <= 0) return min;
+    return ((value - min) % range + range) % range + min;
+  }
+
   var Renderer = {
     canvas: null,
     ctx: null,
@@ -49,6 +70,7 @@
       this.clear();
       if (!game) return;
       this.drawTable(game);
+      this.drawWindField(game);
       this.drawHoles(game);
       this.drawGroupLinks(game);
       this.drawCaps(game);
@@ -93,6 +115,59 @@
       ctx.lineTo(maxX, start.y);
       ctx.stroke();
       ctx.restore();
+    },
+    drawWindField: function (game) {
+      var wind = FC.Physics.windVector(game.stage, game.elapsed);
+      var vectorStrength = Math.hypot(wind.x, wind.y);
+      var strength = game.stage.wind ? game.stage.wind.strength : vectorStrength;
+      if (!strength || !vectorStrength) return;
+
+      var img = FC.Sprites.image("sheet:wind");
+      var sheet = CONFIG.images.sheets.wind;
+      if (!img || !sheet || !sheet.cols) return;
+
+      var rect = this.canvas.getBoundingClientRect();
+      var frameW = img.width / sheet.cols;
+      var frameH = img.height / sheet.rows;
+      var direction = Math.atan2(wind.y, wind.x);
+      var dirX = Math.cos(direction);
+      var dirY = Math.sin(direction);
+      var power = clamp(strength / 40, 0.35, 1.25);
+      var travel = Math.max(rect.width, rect.height) + 180;
+      var speed = 18 + strength * 1.7;
+      var baseAlpha = 0.08 + power * 0.09;
+
+      var ctx = this.ctx;
+      WIND_MARKS.forEach(function (mark, index) {
+        var frame = Math.floor(game.elapsed * sheet.fps + mark.phase * sheet.cols) % sheet.cols;
+        var drift = (game.elapsed * speed + mark.phase * travel) % travel - travel / 2;
+        var sway = Math.sin(game.elapsed * 1.4 + mark.phase * Math.PI * 2) * 10 * power;
+        var x = rect.width * mark.x + dirX * drift - dirY * sway;
+        var y = rect.height * mark.y + dirY * drift + dirX * sway;
+        var margin = 120 * power;
+        var width = (58 + strength * 1.25) * mark.scale;
+        var height = width * frameH / frameW;
+
+        x = wrap(x, -margin, rect.width + margin);
+        y = wrap(y, -margin, rect.height + margin);
+
+        ctx.save();
+        ctx.globalAlpha = clamp(baseAlpha * mark.alpha, 0.06, 0.24);
+        ctx.translate(x, y);
+        ctx.rotate(direction + mark.tilt + Math.sin(game.elapsed * 0.8 + index) * 0.04);
+        ctx.drawImage(
+          img,
+          frame * frameW,
+          0,
+          frameW,
+          frameH,
+          -width / 2,
+          -height / 2,
+          width,
+          height
+        );
+        ctx.restore();
+      });
     },
     drawHoles: function (game) {
       var ctx = this.ctx;
